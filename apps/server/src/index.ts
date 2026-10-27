@@ -4,9 +4,30 @@ import { createServer } from 'node:http';
 import { Server, Socket } from 'socket.io';
 import { randomInt, randomUUID } from 'node:crypto';
 import type { Player, RoomState, PublicQuestion } from '@sophos/shared';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const app=express(); app.use(cors({origin:true})); app.get('/health',(_req,res)=>res.json({ok:true,service:'sophos-server'}));
-const httpServer=createServer(app); const io=new Server(httpServer,{cors:{origin:true,methods:['GET','POST']}});
+const app = express();
+app.use(cors({ origin: true }));
+
+const currentFile = fileURLToPath(import.meta.url);
+const currentDir = path.dirname(currentFile);
+const frontendPath = path.resolve(currentDir, '../../web/dist');
+
+app.use(express.static(frontendPath));
+
+app.get('/health', (_req, res) => {
+  res.json({ ok: true, service: 'sophos-server' });
+});
+
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: { origin: true, methods: ['GET', 'POST'] }
+});
 const PORT=Number(process.env.PORT||3001);
 type Q={id:string;category:string;prompt:string;options:string[];correctIndex:number;explanation:string;round:number;doubleKnowledge?:boolean};
 const questions:Q[]=[
