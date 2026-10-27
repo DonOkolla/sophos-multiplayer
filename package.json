@@ -1,0 +1,8 @@
+{
+  "name": "sophos-multiplayer-trivia",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/web", "apps/server", "packages/shared"],
+  "scripts": {"dev": "concurrently -k -n SERVER,WEB -c yellow,cyan \"npm run dev -w apps/server\" \"npm run dev -w apps/web\"", "build": "npm run build -w apps/web && npm run build -w apps/server", "start": "npm run start -w apps/server"},
+  "devDependencies": {"concurrently": "^9.1.2", "typescript": "^5.7.2"}
+}
